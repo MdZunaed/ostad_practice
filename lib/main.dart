@@ -80,7 +80,7 @@ class _ProductListState extends State<ProductList> {
 }
 
 class CartPage extends StatelessWidget {
-final int total;
+  final int total;
   const CartPage({Key? key,required this.total}) : super(key: key);
 
   @override
