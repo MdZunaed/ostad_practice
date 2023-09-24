@@ -24,8 +24,7 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
-  List<int> count = List.filled(15, 0);
-   int totalCount = 0;
+  Map<int,int> selectedProducts = {};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,31 +38,34 @@ class _ProductListState extends State<ProductList> {
               trailing: FittedBox(
                 child: Column(
                   children: [
-                    Text("Counts: ${count[index]}"),
+                    Text("Counts: ${selectedProducts[index]??0}"),
                     ElevatedButton(
                         onPressed: () {
-                          setState(() {
-                            count[index]++;
-                            totalCount++;
-                            if (count[index] == 5) {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: const Text('Congratulations!'),
-                                  content: Text(
-                                      'You\'ve bought 5 Product ${index + 1}!'),
-                                  actions: [
+                          if(selectedProducts.containsKey(index)){
+                            selectedProducts[index] = selectedProducts[index]! + 1;
+                          } else{
+                            selectedProducts[index] = 1;
+                          }
+                          if (selectedProducts[index] == 5) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title:const Text('Congratulations!'),
+                                  content: Text('You\'ve bought 5 Product $index!'),
+                                  actions: <Widget>[
                                     TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child:const Text("Ok"))
+                                      child:const Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
                                   ],
-                                ),
-                              );
-                            }
-                          });
+                                );
+                              },
+                            );
+                          }
+                          setState(() {});
                         },
                         child: const Text("Buy Now"))
                   ],
@@ -73,15 +75,16 @@ class _ProductListState extends State<ProductList> {
           }),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(total: totalCount)));
+            int totalProduct = selectedProducts.length;
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(totalProductCount: totalProduct)));
           }, child: const Icon(Icons.shopping_cart)),
     );
   }
 }
 
 class CartPage extends StatelessWidget {
-  final int total;
-  const CartPage({Key? key,required this.total}) : super(key: key);
+  final int totalProductCount;
+  const CartPage({Key? key,required this.totalProductCount}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +93,7 @@ class CartPage extends StatelessWidget {
         centerTitle: true,
         title:const Text("Cart")),
       body: Center(child:
-        Text("Total Product: $total")),
+        Text("Total Product: $totalProductCount")),
     );
   }
 }
