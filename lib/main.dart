@@ -15,73 +15,126 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xffF9F9F9)),
+      home: const CartPage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class CartPage extends StatefulWidget {
+  const CartPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CartPage> createState() => _CartPageState();
 }
 
-TextEditingController controller = TextEditingController();
-int totalConsume = 0;
-List<WaterTracks> consumeList = [];
+class _CartPageState extends State<CartPage> {
+  String image =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbTDnV3Enw_7SC2F3UEIYDoehJCuIQdt4mSg&usqp=CAU";
 
-class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Water Tracker")),
+      appBar:
+          AppBar(backgroundColor: Colors.transparent, elevation: 0, actions: [
+        IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search, color: Colors.black))
+      ]),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Total Consume", style: TextStyle(fontSize: 18)),
-            Text(totalConsume.toString(),
-                style:
-                const TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              SizedBox(
-                  width: 100,
-                  child: TextField(
-                      controller: controller,
-                      keyboardType: TextInputType.number)),
-              ElevatedButton(
-                  onPressed: () {
-                    int count = int.tryParse(controller.text.trim()) ?? 1;
-                    WaterTracks wt = WaterTracks(DateTime.now(), count);
-                    consumeList.add(wt);
-                    totalConsume += count;
-                    setState(() {});
-                  },
-                  child: const Text("add"))
-            ]),
+            const Text("My Bag",
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            Expanded(
-                child: ListView.builder(
-                    itemCount: consumeList.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                          child: ListTile(
-                            leading: CircleAvatar(child: Text("${index + 1}")),
-                            trailing: Text(
-                                consumeList[index].noOfGlass.toString()),
-                            title: Text(DateFormat('hh:mm:s a d-MMM-yy')
-                                .format(consumeList[index].time)),
-                            onLongPress: () {
-                              totalConsume -= consumeList[index].noOfGlass;
-                              consumeList.removeAt(index);
-                              setState(() {});
-                            },
-                          ));
-                    }))
+            SizedBox(
+                child: Card(
+              margin: const EdgeInsets.only(bottom: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              clipBehavior: Clip.antiAlias,
+              child: Row(
+                children: [
+                  Expanded(
+                      flex: 1, child: Image.network(image, fit: BoxFit.fill)),
+                  Expanded(
+                      flex: 3,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("asdff",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  Icon(Icons.more_vert)
+                                ]),
+                            Row(children: [
+                              Text("Color: ",
+                                  style: TextStyle(color: Colors.grey)),
+                              Text("Black"),
+                              SizedBox(width: 10),
+                              Text("Size: ",
+                                  style: TextStyle(color: Colors.grey)),
+                              Text("L"),
+                            ]),
+                            SizedBox(height: 10),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(children: [
+                                    InkWell(
+                                      child: Material(
+                                          elevation: 4,
+                                          shape: const CircleBorder(),
+                                          child: CircleAvatar(
+                                              backgroundColor: Colors.white,
+                                              child: Icon(Icons.remove,
+                                                  color: Colors.black))),
+                                      onTap: () {},
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text("1",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(width: 10),
+                                    InkWell(
+                                      child: Material(
+                                          elevation: 4,
+                                          shape: const CircleBorder(),
+                                          child: CircleAvatar(
+                                              backgroundColor: Colors.white,
+                                              child: Icon(Icons.add,
+                                                  color: Colors.black))),
+                                      onTap: () {},
+                                    ),
+                                  ]),
+                                  Text("30\$",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold))
+                                ]),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            )),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text("Total amount:"), Text("124\$")],
+            )
           ],
         ),
       ),
