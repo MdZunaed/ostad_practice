@@ -29,7 +29,7 @@ class CartItem extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Row(
         children: [
-          Expanded(flex: 1, child: Image.network(image, fit: BoxFit.fill)),
+          Expanded(flex: 1, child: Image.network(image, fit: BoxFit.cover)),
           Expanded(
               flex: 3,
               child: Container(
