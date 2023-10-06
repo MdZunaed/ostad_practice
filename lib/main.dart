@@ -46,21 +46,21 @@ List<Product> products = [
       "T-shirt",
       "White",
       "M",
-      0,
+      1,
       51),
   Product(
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNI0nx4BxVOOiZNDqL5dqNMU8xxICeJBrRgw&usqp=CAU",
       "Full Sleeve Shirt",
       "Grey",
       "L",
-      0,
+      1,
       30),
   Product(
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScsNGap6ethOK5Ir_6cQ0xH2F2IC7OqIL1rA&usqp=CAU",
       "Hoodie",
       "Black",
       "XL",
-      0,
+      1,
       43),
 ];
 
@@ -80,7 +80,7 @@ class _CartPageState extends State<CartPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text("My Bag",
-                style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Expanded(
                 child: ListView.builder(
@@ -109,7 +109,7 @@ class _CartPageState extends State<CartPage> {
               const Text("Total amount:"),
               Text("$totalAmount\$",
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
+                      fontSize: 18, fontWeight: FontWeight.bold)),
             ]),
             const SizedBox(height: 10),
             SizedBox(
