@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
 class MyBottomSheet extends StatelessWidget {
-  final String title;
-  final String buttonName;
-  final TextEditingController teController;
+  final TextEditingController titleController;
+  final TextEditingController detailsController;
   final Key formKey;
   final VoidCallback onButtonTap;
 
   const MyBottomSheet(
       {super.key,
       required this.formKey,
-      required this.title,
-      required this.buttonName,
-      required this.teController,
+      required this.titleController,
+      required this.detailsController,
       required this.onButtonTap});
 
   @override
@@ -23,31 +21,42 @@ class MyBottomSheet extends StatelessWidget {
         key: formKey,
         child: Column(
           //mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.bodyLarge),
+            MyTextField(hintText: "enter title", controller: titleController),
             const SizedBox(height: 10),
-            TextFormField(
-                validator: (String? value) {
-                  if (value?.isEmpty ?? true) {
-                    return "enter text";
-                  }
-                  return null;
-                },
-                minLines: 1,
-                maxLines: 3,
-                controller: teController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)))),
+            MyTextField(
+                hintText: "enter description", controller: detailsController),
             const SizedBox(height: 10),
-            SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                    onPressed: onButtonTap, child: Text(buttonName)))
+            ElevatedButton(
+                onPressed: onButtonTap, child: const Text("Edit Done"))
           ],
         ),
       ),
+    );
+  }
+}
+
+class MyTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+
+  const MyTextField(
+      {super.key, required this.controller, required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: TextFormField(
+          controller: controller,
+          validator: (String? value) {
+            if (value?.isEmpty ?? true) {
+              return "enter valid text";
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+              hintText: hintText, border: const OutlineInputBorder())),
     );
   }
 }

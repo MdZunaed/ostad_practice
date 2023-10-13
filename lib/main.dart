@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:ostad_practice/bottom_sheet.dart';
 
 void main() {
@@ -15,8 +14,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           //useMaterial3: true,
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.cyan),
-          primaryColor: Colors.cyan),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.red),
+          primaryColor: Colors.redAccent),
       home: const HomePage(),
     );
   }
@@ -29,152 +28,145 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-TextEditingController addController = TextEditingController();
-TextEditingController updateController = TextEditingController();
+TextEditingController addTitleController = TextEditingController();
+TextEditingController addDetailsController = TextEditingController();
+TextEditingController editTitleController = TextEditingController();
+TextEditingController editDetailsController = TextEditingController();
 GlobalKey<FormState> formKey = GlobalKey();
-List<String> todos = [];
-List<Todo> todoList = [];
+GlobalKey<FormState> editFormKey = GlobalKey();
+List<Item> itemList = [];
 
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Task"), centerTitle: true),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addTodo();
-        },
-        child: const Icon(Icons.add),
-      ),
+      appBar: AppBar(backgroundColor: Colors.white, actions: [
+        IconButton(
+            onPressed: () {}, icon: const Icon(Icons.search, color: Colors.red))
+      ]),
       body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView.builder(
-            itemCount: todoList.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              final Todo todo = todoList[index];
-              final date = DateFormat('hh:mm a dd-MM-yy').format(todo.dateTime);
-              return Card(
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                child: ListTile(
-                  tileColor: todo.status == "pending"
-                      ? Colors.amberAccent
-                      : Theme.of(context).primaryColor,
-                  leading: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Text("${index + 1}")),
-                  title: Text(todo.todo),
-                  subtitle: Text(date),
-                  trailing: Text(todo.status.toUpperCase()),
-                  onLongPress: () {
-                    todo.status = todo.status == "pending" ? "done" : "pending";
-                    setState(() {});
+        padding: const EdgeInsets.all(10),
+        child: Form(
+          key: formKey,
+          child: Column(
+            children: [
+              MyTextField(
+                  hintText: "enter title", controller: addTitleController),
+              const SizedBox(height: 10),
+              MyTextField(
+                  hintText: "enter description",
+                  controller: addDetailsController),
+              ElevatedButton(
+                  onPressed: () {
+                    addItem();
                   },
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ListTile(
-                                    leading: const Icon(Icons.restore,
-                                        color: Colors.amberAccent),
-                                    title: Text(todo.status == "pending"
-                                        ? "mark as done"
-                                        : "mark as pending"),
-                                    onTap: () {
-                                      todo.status = (todo.status == "pending")
-                                          ? "done"
-                                          : "pending";
-                                      setState(() {});
-                                      Navigator.pop(context);
-                                    }),
-                                ListTile(
-                                    leading: const Icon(Icons.edit,
-                                        color: Colors.cyan),
-                                    title: const Text("Update"),
-                                    onTap: () {
-                                      updateController.text = todo.todo;
-                                      Navigator.pop(context);
-                                      updateTask(index);
-                                    }),
-                                ListTile(
-                                    leading: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    title: const Text("Delete"),
-                                    onTap: () {
-                                      todoList.removeAt(index);
-                                      Navigator.pop(context);
-                                      setState(() {});
-                                    }),
-                              ],
-                            ),
-                          );
-                        });
-                  },
-                ),
-              );
-            }),
+                  child: const Text("Add")),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: itemList.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 5),
+                    itemBuilder: (context, index) {
+                      final Item item = itemList[index];
+                      return Card(
+                        color: Colors.grey.shade300,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                              backgroundColor: Colors.red,
+                              child: Text("${index + 1}")),
+                          title: Text(item.title,
+                              style: const TextStyle(fontSize: 17)),
+                          subtitle: Text(item.details),
+                          trailing: const Icon(Icons.arrow_forward),
+                          onLongPress: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Alert"),
+                                    content: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                              onPressed: () {
+                                                editTitleController.text =
+                                                    item.title;
+                                                editDetailsController.text =
+                                                    item.details;
+                                                Navigator.pop(context);
+                                                updateItem(context, index);
+                                              },
+                                              child: const Text("Edit")),
+                                          TextButton(
+                                              onPressed: () {
+                                                itemList.removeAt(index);
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              },
+                                              child: const Text("Delete")),
+                                        ]),
+                                  );
+                                });
+                          },
+                        ),
+                      );
+                    }),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  addTodo() {
-    showModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        context: context,
-        builder: (context) {
-          return MyBottomSheet(
-              formKey: formKey,
-              title: "Add new task",
-              buttonName: "Add",
-              teController: addController,
-              onButtonTap: () {
-                if (formKey.currentState!.validate()) {
-                  Todo todo = Todo(
-                      todo: addController.text.trim(),
-                      dateTime: DateTime.now());
-                  todoList.add(todo);
-                  Navigator.pop(context);
-                  addController.clear();
-                  setState(() {});
-                }
-              });
-        });
+  addItem() {
+    if (formKey.currentState!.validate()) {
+      Item item = Item(
+          title: addTitleController.text.trim(),
+          details: addDetailsController.text.trim());
+      itemList.add(item);
+      addTitleController.clear();
+      addDetailsController.clear();
+      setState(() {});
+    }
   }
 
-  updateTask(index) {
+  updateItem(context, index) {
     showModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
         context: context,
         builder: (context) {
           return MyBottomSheet(
-              formKey: formKey,
-              title: "Update your task",
-              buttonName: "Update",
-              teController: updateController,
+              formKey: editFormKey,
+              titleController: editTitleController,
+              detailsController: editDetailsController,
               onButtonTap: () {
-                if (formKey.currentState!.validate()) {
-                  String newTodo = updateController.text.trim();
-                  todoList[index].todo = newTodo;
-                  setState(() {});
+                if (editFormKey.currentState!.validate()) {
+                  Item newItem = Item(
+                      title: editTitleController.text.trim(),
+                      details: editDetailsController.text.trim());
+                  itemList[index] = newItem;
                   Navigator.pop(context);
+                  setState(() {});
                 }
               });
         });
   }
 }
 
-class Todo {
-  String todo;
-  String status;
-  DateTime dateTime;
+class Item {
+  String title;
+  String details;
 
-  Todo({required this.todo, this.status = "pending", required this.dateTime});
+  Item({required this.title, required this.details});
 }
+
+// floatingActionButton: FloatingActionButton(
+//   onPressed: () {
+//     addTodo();
+//   },
+//   child: const Icon(Icons.add),
+// ),
