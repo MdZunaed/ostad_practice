@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:ostad_practice/screen/add_product_page.dart';
 
+import '../screen/product_list.dart';
+
 class ProductItem extends StatelessWidget {
-  const ProductItem({super.key});
+  final Product product;
+
+  const ProductItem({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Image.network(
-          'https://miro.medium.com/v2/resize:fit:1400/1*YMJDp-kqus7i-ktWtksNjg.jpeg'),
-      trailing: const Text("\$123"),
-      title: const Text("Product Name"),
-      subtitle:
-          const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text("product code"),
-          SizedBox(width: 20),
-          Text("price")
-        ]),
-        Text("description")
+      leading: Image.network(product.image, width: 70),
+      trailing: Text("\$${product.totalPrice}"),
+      title: Text(product.productName),
+      subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(product.id),
+        Text("price: ${product.unitPrice}"),
+        Text("Qty: ${product.quantity}")
       ]),
       onTap: () {
         showDialog(
