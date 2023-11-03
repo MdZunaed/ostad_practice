@@ -55,16 +55,15 @@ class _PhotoGalleryState extends State<PhotoGallery> {
               separatorBuilder: (c, i) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 return ListTile(
-                  leading: Image.network(photoList[index].thumbnail),
-                  title: Text(photoList[index].title),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                PhotoDetails(photoModel: photoList[index])));
-                  },
-                );
+                    leading: Image.network(photoList[index].thumbnail),
+                    title: Text(photoList[index].title),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PhotoDetails(photoModel: photoList[index])));
+                    });
               }),
     );
   }

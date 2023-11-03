@@ -16,9 +16,9 @@ class PhotoDetails extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("ID: ${photoModel.id}", style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 10),
             Image.network(photoModel.image),
+            const SizedBox(height: 10),
+            Text("ID: ${photoModel.id}", style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 10),
             Text(photoModel.title, style: const TextStyle(fontSize: 16)),
           ],
