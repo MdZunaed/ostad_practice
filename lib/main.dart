@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
-
-import 'screen/photo_gallery.dart';
+import 'package:get/get.dart';
+import 'package:ostad_practice/controller/count_controller.dart';
+import 'screen/home_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const PhotoGallery(),
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      initialBinding: GetXBindings(),
+      home: const HomePage(),
     );
+  }
+}
+
+class GetXBindings extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(CountController());
   }
 }
