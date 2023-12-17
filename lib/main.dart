@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:ostad_practice/screen/google_maps.dart';
 import 'screen/home_page.dart';
 
 void main() async {
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.indigo),
-      home: const GoogleMapScreen(),
+      home: const HomePage(),
     );
   }
 }
