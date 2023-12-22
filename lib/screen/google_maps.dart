@@ -13,11 +13,9 @@ class GoogleMapScreen extends StatefulWidget {
 class _GoogleMapScreenState extends State<GoogleMapScreen> {
   Location location = Location();
   late GoogleMapController mapController;
-  Marker? marker;
   List<LatLng> polyLinesLatLng = [];
   Set<Polyline> polyLines = {};
-  Set<Marker> markers = {};
-  late LocationData lastLocation;
+  LocationData? userLocation;
 
   Future<void> grantLocationPermission() async {
     PermissionStatus permission = await location.hasPermission();
@@ -29,30 +27,19 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   Future<void> animateToUserLocation() async {
     //location.enableBackgroundMode(enable: true);
-    LocationData currentLocation = await location.getLocation();
+    userLocation = await location.getLocation();
     await mapController.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
-            target:
-            LatLng(currentLocation.latitude!, currentLocation.longitude!),
+            target: LatLng(
+                userLocation?.latitude ?? 0, userLocation?.longitude ?? 0),
             zoom: 18)));
-    setState(() {});
   }
 
   Future<void> updateUserLocation() async {
-    lastLocation = await location.getLocation();
+    userLocation = await location.getLocation();
     Timer.periodic(const Duration(seconds: 10), (timer) async {
-      // marker = Marker(
-      //     markerId: const MarkerId("last location"),
-      //     position: LatLng(lastLocation.longitude!, lastLocation.longitude!),
-      //     icon: BitmapDescriptor.defaultMarker,
-      //     consumeTapEvents: true,
-      //     onTap: () {},
-      //     infoWindow: InfoWindow(
-      //       title: "My current location",
-      //       snippet: "${lastLocation.latitude}, ${lastLocation.longitude}",
-      //     ));
-      polyLinesLatLng
-          .add(LatLng(lastLocation.latitude!, lastLocation.longitude!));
+      polyLinesLatLng.add(
+          LatLng(userLocation?.latitude ?? 0, userLocation?.longitude ?? 0));
       polyLines.add(Polyline(
         polylineId: const PolylineId("last location"),
         color: Colors.red,
@@ -86,12 +73,15 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         onMapCreated: (GoogleMapController controller) {
           mapController = controller;
         },
-        //markers: marker != null ? {marker!} : {},
         markers: {
           Marker(
-              markerId: const MarkerId("last location"),
-              position:
-              LatLng(lastLocation.latitude!, lastLocation.longitude!)),
+              markerId: const MarkerId("User Location"),
+              position: LatLng(
+                  userLocation?.latitude ?? 0, userLocation?.longitude ?? 0),
+              infoWindow: InfoWindow(
+                  title: "My Current Location",
+                  snippet:
+                      "${userLocation?.latitude ?? ''} ${userLocation?.longitude ?? ''}")),
         },
         polylines: polyLines,
       ),
