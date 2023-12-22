@@ -17,6 +17,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   List<LatLng> polyLinesLatLng = [];
   Set<Polyline> polyLines = {};
   Set<Marker> markers = {};
+  late LocationData lastLocation;
 
   Future<void> grantLocationPermission() async {
     PermissionStatus permission = await location.hasPermission();
@@ -32,34 +33,33 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
     await mapController.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
             target:
-                LatLng(currentLocation.latitude!, currentLocation.longitude!),
+            LatLng(currentLocation.latitude!, currentLocation.longitude!),
             zoom: 18)));
     setState(() {});
   }
 
   Future<void> updateUserLocation() async {
+    lastLocation = await location.getLocation();
     Timer.periodic(const Duration(seconds: 10), (timer) async {
-      LocationData lastLocation = await location.getLocation();
-      setState(() {
-        marker = Marker(
-            markerId: const MarkerId("last location"),
-            position: LatLng(lastLocation.longitude!, lastLocation.longitude!),
-            icon: BitmapDescriptor.defaultMarker,
-            consumeTapEvents: true,
-            onTap: () {},
-            infoWindow: InfoWindow(
-              title: "My current location",
-              snippet: "${lastLocation.latitude}, ${lastLocation.longitude}",
-            ));
-        polyLinesLatLng
-            .add(LatLng(lastLocation.latitude!, lastLocation.longitude!));
-        polyLines.add(Polyline(
-          polylineId: const PolylineId("last location"),
-          color: Colors.red,
-          width: 3,
-          points: polyLinesLatLng,
-        ));
-      });
+      // marker = Marker(
+      //     markerId: const MarkerId("last location"),
+      //     position: LatLng(lastLocation.longitude!, lastLocation.longitude!),
+      //     icon: BitmapDescriptor.defaultMarker,
+      //     consumeTapEvents: true,
+      //     onTap: () {},
+      //     infoWindow: InfoWindow(
+      //       title: "My current location",
+      //       snippet: "${lastLocation.latitude}, ${lastLocation.longitude}",
+      //     ));
+      polyLinesLatLng
+          .add(LatLng(lastLocation.latitude!, lastLocation.longitude!));
+      polyLines.add(Polyline(
+        polylineId: const PolylineId("last location"),
+        color: Colors.red,
+        width: 3,
+        points: polyLinesLatLng,
+      ));
+      setState(() {});
     });
   }
 
@@ -86,7 +86,13 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         onMapCreated: (GoogleMapController controller) {
           mapController = controller;
         },
-        markers: marker != null ? {marker!} : {},
+        //markers: marker != null ? {marker!} : {},
+        markers: {
+          Marker(
+              markerId: const MarkerId("last location"),
+              position:
+              LatLng(lastLocation.latitude!, lastLocation.longitude!)),
+        },
         polylines: polyLines,
       ),
     );
