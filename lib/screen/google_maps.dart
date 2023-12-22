@@ -16,6 +16,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   List<LatLng> polyLinesLatLng = [];
   Set<Polyline> polyLines = {};
   LocationData? userLocation;
+  late StreamSubscription locationSubscription;
 
   Future<void> grantLocationPermission() async {
     PermissionStatus permission = await location.hasPermission();
@@ -36,8 +37,11 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   }
 
   Future<void> updateUserLocation() async {
-    userLocation = await location.getLocation();
     Timer.periodic(const Duration(seconds: 10), (timer) async {
+      locationSubscription = location.onLocationChanged.listen((locationData) {
+        userLocation = locationData;
+        setState(() {});
+      });
       polyLinesLatLng.add(
           LatLng(userLocation?.latitude ?? 0, userLocation?.longitude ?? 0));
       polyLines.add(Polyline(
