@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:label="ostad_practice"
+        android:label="Ostad Practice"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -31,6 +31,6 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCo8-yiIw1gvN6Dk2m69K3EEk2kVVPi5-s" />
+            android:value="AIzaSyAefZ7EjAPfuXPmcO4PdXFSgRfM-ryVi4s" />
     </application>
 </manifest>
