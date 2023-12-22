@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 class GoogleMapScreen extends StatefulWidget {
   const GoogleMapScreen({super.key});
@@ -12,78 +11,84 @@ class GoogleMapScreen extends StatefulWidget {
 }
 
 class _GoogleMapScreenState extends State<GoogleMapScreen> {
-  Completer<GoogleMapController> mapController = Completer();
-  late LatLng? onTapLatLng;
-  final initialPosition = const CameraPosition(
-      target: LatLng(23.674864963231546, 90.47866518466321), zoom: 14);
-  List<Marker> markers = [
-    Marker(
-        markerId: MarkerId("bhuigor"),
-        position: LatLng(23.690079231225063, 90.47814031459566)),
-    Marker(
-        markerId: MarkerId("delpara"),
-        position: LatLng(23.66599759026365, 90.47950051724911)),
-  ];
-  List<Polygon> polygons = [
-    Polygon(
-        polygonId: const PolygonId("bhuigor"),
-        fillColor: Colors.transparent,
-        strokeColor: Colors.red.shade100,
-        strokeWidth: 2,
-        consumeTapEvents: true,
-        onTap: () {
-          log('bhuigor');
-        },
-        points: const [
-          LatLng(23.690802978956047, 90.4768156260252),
-          LatLng(23.69146767867288, 90.47784961760044),
-          LatLng(23.69123127315668, 90.47947838902473),
-          LatLng(23.68988498163607, 90.47974560409784),
-          LatLng(23.68860591507858, 90.4797026887536),
-          LatLng(23.688166559272947, 90.477837882936),
-          LatLng(23.68924544992331, 90.47659702599049)
-        ]),
-  ];
-  List<Circle> circles = [
-    Circle(
-        circleId: const CircleId("delpara"),
-        fillColor: Colors.transparent,
-        strokeColor: Colors.red.shade100,
-        strokeWidth: 2,
-        onTap: () {
-          log("delpara");
-        },
-        center: const LatLng(23.66599759026365, 90.47950051724911),
-        radius: 150),
-  ];
+  Location location = Location();
+  late GoogleMapController mapController;
+  Marker? marker;
+  List<LatLng> polyLinesLatLng = [];
+  Set<Polyline> polyLines = {};
+  Set<Marker> markers = {};
+
+  Future<void> grantLocationPermission() async {
+    PermissionStatus permission = await location.hasPermission();
+    if (permission == PermissionStatus.denied ||
+        permission == PermissionStatus.deniedForever) {
+      await location.requestPermission();
+    }
+  }
+
+  Future<void> animateToUserLocation() async {
+    //location.enableBackgroundMode(enable: true);
+    LocationData currentLocation = await location.getLocation();
+    await mapController.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+            target:
+                LatLng(currentLocation.latitude!, currentLocation.longitude!),
+            zoom: 18)));
+    setState(() {});
+  }
+
+  Future<void> updateUserLocation() async {
+    Timer.periodic(const Duration(seconds: 10), (timer) async {
+      LocationData lastLocation = await location.getLocation();
+      setState(() {
+        marker = Marker(
+            markerId: const MarkerId("last location"),
+            position: LatLng(lastLocation.longitude!, lastLocation.longitude!),
+            icon: BitmapDescriptor.defaultMarker,
+            consumeTapEvents: true,
+            onTap: () {},
+            infoWindow: InfoWindow(
+              title: "My current location",
+              snippet: "${lastLocation.latitude}, ${lastLocation.longitude}",
+            ));
+        polyLinesLatLng
+            .add(LatLng(lastLocation.latitude!, lastLocation.longitude!));
+        polyLines.add(Polyline(
+          polylineId: const PolylineId("last location"),
+          color: Colors.red,
+          width: 3,
+          points: polyLinesLatLng,
+        ));
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    grantLocationPermission();
+    animateToUserLocation();
+    updateUserLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Google Map")),
+      appBar: AppBar(title: const Text("Real-Time Location Tracker")),
       body: GoogleMap(
-        initialCameraPosition: initialPosition,
+        initialCameraPosition: const CameraPosition(
+            target: LatLng(23.807520589618566, 90.41831215498202), zoom: 14),
         mapType: MapType.hybrid,
         myLocationEnabled: true,
         myLocationButtonEnabled: true,
         zoomControlsEnabled: true,
         zoomGesturesEnabled: true,
         onMapCreated: (GoogleMapController controller) {
-          mapController.complete(controller);
+          mapController = controller;
         },
-        onTap: (LatLng latLng) {
-          log(latLng.toString());
-          onTapLatLng = latLng;
-          setState(() {});
-        },
-        markers: Set.of(markers),
-        polygons: Set.of(polygons),
-        circles: Set.of(circles),
+        markers: marker != null ? {marker!} : {},
+        polylines: polyLines,
       ),
     );
-  }
-
-  void showSnackMessage(text) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 }
